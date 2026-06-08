@@ -93,7 +93,7 @@ export function AssessmentForm({ tenant }: { tenant: Tenant }) {
   const [propertyAddress, setPropertyAddress] = useState('')
 
   // Step 2
-  const [serviceType, setServiceType] = useState('')
+  const [serviceTypes, setServiceTypes] = useState<string[]>([])
   const [treeCount, setTreeCount] = useState('')
   const [treeHeight, setTreeHeight] = useState('')
   const [hazards, setHazards] = useState<string[]>([])
@@ -162,7 +162,7 @@ export function AssessmentForm({ tenant }: { tenant: Tenant }) {
       fd.append('customerEmail', customerEmail)
       fd.append('customerPhone', customerPhone)
       fd.append('propertyAddress', propertyAddress)
-      fd.append('serviceType', serviceType)
+      serviceTypes.forEach(st => fd.append('serviceTypes', st))
       fd.append('treeCount', treeCount)
       fd.append('treeHeight', treeHeight)
       hazards.forEach(h => fd.append('hazards', h))
@@ -323,7 +323,7 @@ export function AssessmentForm({ tenant }: { tenant: Tenant }) {
         <div style={{ maxWidth: '672px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           {tenant.logo_url ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={tenant.logo_url} alt={tenant.business_name} style={{ height: '36px', objectFit: 'contain' }} />
+            <img src={tenant.logo_url} alt={tenant.business_name} style={{ height: '36px', objectFit: 'contain', display: 'block', marginLeft: 0 }} />
           ) : (
             <span style={{ fontFamily: fontHeading, fontWeight: 700, fontSize: '18px', color: primary }}>
               {tenant.business_name}
@@ -379,7 +379,7 @@ export function AssessmentForm({ tenant }: { tenant: Tenant }) {
             <p style={{ fontFamily: fontSans, color: '#6B7280', fontSize: '14px', lineHeight: 1.5 }}>
               {currentStep === 1 && "We'll use this to send you your assessment report."}
               {currentStep === 2 && 'The more detail you provide the more accurate your assessment.'}
-              {currentStep === 3 && 'Photos help us give you the most accurate assessment possible.'}
+              {currentStep === 3 && "Photos help us give you the most accurate assessment. Don't have any right now? No problem — skip this step and we'll collect them later."}
             </p>
           </div>
 
@@ -451,12 +451,16 @@ export function AssessmentForm({ tenant }: { tenant: Tenant }) {
                     <button
                       key={value}
                       type="button"
-                      className={`af-service-card${serviceType === value ? ' selected' : ''}`}
-                      onClick={() => setServiceType(value)}
+                      className={`af-service-card${serviceTypes.includes(value) ? ' selected' : ''}`}
+                      onClick={() =>
+                        setServiceTypes(prev =>
+                          prev.includes(value) ? prev.filter(s => s !== value) : [...prev, value]
+                        )
+                      }
                     >
                       <Icon
                         size={24}
-                        color={serviceType === value ? primary : '#6B7280'}
+                        color={serviceTypes.includes(value) ? primary : '#6B7280'}
                         style={{ margin: '0 auto 8px', display: 'block' }}
                       />
                       <span style={{ fontFamily: fontSans, color: '#0D0D0D', fontSize: '13px', fontWeight: 600 }}>
@@ -570,8 +574,8 @@ export function AssessmentForm({ tenant }: { tenant: Tenant }) {
                 <button onClick={() => goToStep(1)} style={backBtnStyle}>← Back</button>
                 <button
                   onClick={() => goToStep(3)}
-                  disabled={!serviceType}
-                  style={nextBtnStyle(!serviceType)}
+                  disabled={serviceTypes.length === 0}
+                  style={nextBtnStyle(serviceTypes.length === 0)}
                 >
                   Next →
                 </button>
@@ -590,7 +594,12 @@ export function AssessmentForm({ tenant }: { tenant: Tenant }) {
                       {num}
                     </div>
                     <div>
-                      <p style={{ fontFamily: fontSans, color: '#0D0D0D', fontSize: '14px', fontWeight: 600, margin: '0 0 2px' }}>{label}</p>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '2px' }}>
+                        <p style={{ fontFamily: fontSans, color: '#0D0D0D', fontSize: '14px', fontWeight: 600, margin: 0 }}>{label}</p>
+                        <span style={{ background: '#F3F4F6', color: '#9CA3AF', fontFamily: fontSans, fontSize: '10px', fontWeight: 600, padding: '2px 6px', borderRadius: '999px', flexShrink: 0 }}>
+                          Optional
+                        </span>
+                      </div>
                       <p style={{ fontFamily: fontSans, color: '#6B7280', fontSize: '13px', margin: 0 }}>{helper}</p>
                     </div>
                   </div>
@@ -619,7 +628,7 @@ export function AssessmentForm({ tenant }: { tenant: Tenant }) {
                       Tap to add photos
                     </p>
                     <p style={{ fontFamily: fontSans, color: '#9CA3AF', fontSize: '13px', margin: 0 }}>
-                      JPG, PNG up to 10MB each
+                      JPG, PNG up to 10MB each · Optional
                     </p>
                   </>
                 ) : (
@@ -653,6 +662,19 @@ export function AssessmentForm({ tenant }: { tenant: Tenant }) {
                   )}
                 </div>
               )}
+
+              {/* Skip link */}
+              <p style={{ textAlign: 'center', marginTop: '16px', fontFamily: fontSans, fontSize: '13px', color: '#9CA3AF' }}>
+                No photos?{' '}
+                <span
+                  onClick={handleSubmit}
+                  style={{ fontWeight: 500, cursor: 'pointer', textDecoration: 'underline', transition: 'color 150ms' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLSpanElement).style.color = '#4A4A4A' }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLSpanElement).style.color = '#9CA3AF' }}
+                >
+                  Skip this step →
+                </span>
+              </p>
 
               {/* Error */}
               {error && (

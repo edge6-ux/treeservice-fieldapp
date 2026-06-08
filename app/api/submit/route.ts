@@ -159,7 +159,7 @@ export async function POST(req: Request) {
     const customerEmail = formData.get('customerEmail') as string
     const customerPhone = formData.get('customerPhone') as string
     const propertyAddress = formData.get('propertyAddress') as string
-    const serviceType = formData.get('serviceType') as string
+    const serviceTypes = formData.getAll('serviceTypes') as string[]
     const treeCount = formData.get('treeCount') as string
     const treeHeight = formData.get('treeHeight') as string
     const hazards = formData.getAll('hazards') as string[]
@@ -192,7 +192,7 @@ export async function POST(req: Request) {
 
     // 4. Build form data object
     const formDataObj = {
-      service_type: serviceType,
+      service_type: serviceTypes.join(', '),
       tree_count: treeCount,
       tree_height: treeHeight,
       hazards,
@@ -252,7 +252,7 @@ Operator report rules:
 Business: ${tenant.business_name}
 Customer: ${customerName}
 Address: ${propertyAddress}
-Service needed: ${serviceType.replace(/_/g, ' ')}
+Service needed: ${serviceTypes.join(', ').replace(/_/g, ' ')}
 Tree count: ${treeCount || 'Not specified'}
 Tree height: ${treeHeight || 'Not specified'}
 Hazards: ${hazards.join(', ') || 'None reported'}
@@ -312,7 +312,7 @@ Photos submitted: ${imageUrls.length}`,
               tenant,
               customerName,
               propertyAddress,
-              serviceType,
+              serviceType: serviceTypes.join(', '),
               customerReport,
             }),
           }),
@@ -326,7 +326,7 @@ Photos submitted: ${imageUrls.length}`,
               customerEmail,
               customerPhone,
               propertyAddress,
-              serviceType,
+              serviceType: serviceTypes.join(', '),
               urgency,
               imageCount: imageUrls.length,
               submissionId: submission.id as string,
