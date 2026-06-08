@@ -319,20 +319,18 @@ export function AssessmentForm({ tenant }: { tenant: Tenant }) {
       <style>{dynamicCss}</style>
 
       {/* ── Header ── */}
-      <div style={{ background: 'white', borderBottom: '1px solid #E5E7EB', padding: '16px 24px' }}>
-        <div style={{ maxWidth: '672px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          {tenant.logo_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={tenant.logo_url} alt={tenant.business_name} style={{ height: '36px', objectFit: 'contain', display: 'block', marginLeft: 0 }} />
-          ) : (
-            <span style={{ fontFamily: fontHeading, fontWeight: 700, fontSize: '18px', color: primary }}>
-              {tenant.business_name}
-            </span>
-          )}
-          <span style={{ fontFamily: fontSans, color: '#6B7280', fontSize: '13px' }}>
-            Free Assessment
+      <div style={{ background: 'white', borderBottom: '1px solid #E5E7EB', padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        {tenant.logo_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={tenant.logo_url} alt={tenant.business_name} style={{ height: '36px', objectFit: 'contain', display: 'block' }} />
+        ) : (
+          <span style={{ fontFamily: fontHeading, fontWeight: 700, fontSize: '18px', color: primary }}>
+            {tenant.business_name}
           </span>
-        </div>
+        )}
+        <span style={{ fontFamily: fontSans, color: '#6B7280', fontSize: '13px' }}>
+          Free Assessment
+        </span>
       </div>
 
       {/* ── Progress bar ── */}

@@ -1,6 +1,6 @@
 export type Industry = 'tree_services'
 
-export type SubmissionStatus = 'new' | 'reviewed' | 'quoted' | 'won' | 'lost'
+export type SubmissionStatus = 'new' | 'contacted' | 'reviewed' | 'quoted' | 'won' | 'lost'
 
 export type Tenant = {
   id: string
@@ -31,6 +31,8 @@ export type FieldSubmission = {
   operator_report: string
   status: SubmissionStatus
   notes: string
+  contacted_at: string | null
+  contact_method: 'phone' | 'email' | null
 }
 
 export type TreeServiceFormData = {
