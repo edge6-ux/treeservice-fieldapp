@@ -28,6 +28,7 @@ export function AdminDashboard({ tenant, submissions: initialSubmissions, userEm
   const [contactDate, setContactDate] = useState(new Date().toISOString().split('T')[0])
   const [contactMethod, setContactMethod] = useState<'phone' | 'email' | null>(null)
   const [savingContact, setSavingContact] = useState(false)
+  const [contactError, setContactError] = useState<string | null>(null)
   const router = useRouter()
 
   const primary = tenant.primary_color
@@ -57,8 +58,9 @@ export function AdminDashboard({ tenant, submissions: initialSubmissions, userEm
   async function saveContact() {
     if (!contactMethod) return
     setSavingContact(true)
+    setContactError(null)
 
-    await fetch(`/api/submissions/${contactingId}`, {
+    const res = await fetch(`/api/submissions/${contactingId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -67,6 +69,13 @@ export function AdminDashboard({ tenant, submissions: initialSubmissions, userEm
         contact_method: contactMethod,
       }),
     })
+
+    if (!res.ok) {
+      const body = await res.json() as { error?: string }
+      setContactError(body.error ?? 'Failed to save. Please try again.')
+      setSavingContact(false)
+      return
+    }
 
     setSubmissions(prev =>
       prev.map(s =>
@@ -518,7 +527,7 @@ export function AdminDashboard({ tenant, submissions: initialSubmissions, userEm
             justifyContent: 'center',
             padding: '16px',
           }}
-          onClick={() => setContactingId(null)}
+          onClick={() => { setContactingId(null); setContactError(null) }}
         >
           <div
             style={{
@@ -588,9 +597,15 @@ export function AdminDashboard({ tenant, submissions: initialSubmissions, userEm
               </div>
             </div>
 
+            {contactError && (
+              <p style={{ fontFamily: fontSans, color: '#E24B4A', fontSize: '13px', marginBottom: '16px' }}>
+                {contactError}
+              </p>
+            )}
+
             <div style={{ display: 'flex', gap: '12px' }}>
               <button
-                onClick={() => setContactingId(null)}
+                onClick={() => { setContactingId(null); setContactError(null) }}
                 style={{
                   flex: 1,
                   background: 'white',
